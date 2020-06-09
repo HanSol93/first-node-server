@@ -1,47 +1,24 @@
-// 서버를 만드는 모듈을 불러옴 
-const http = require('http');
-const url = require('url');
-const fs = require('fs');
+const path = require("path");
+const route = require("./route");
+const express = require("express");
+const app = express();
 
-// 서버 만드는 메서드 
-http.createServer((request, response) => {
+app.use(express.static(path.join(__dirname, "html")));
 
-    // url에서 path 추출
-    const path = url.parse(request.url, true).pathname;
+app.use("/", route);
 
-    // GET요청이면
-    if (request.method === 'GET') {
-        switch (path) {
-            case '/about':
-                // header 설정
-                response.writeHead(200, { 'Content-Type': 'text/html' })
-                    // 파일 읽는 메서드 
-                fs.readFile(__dirname + '/about.html', (err, data) => {
-                    if (err) {
-                        // 에러 발생시 에러 기록 후 종료 
-                        return console.error(err);
-                    }
-                    // 브라우저로 전송
-                    response.end(data, 'utf-8');
-                });
-                break;
+app.use((req, res, next) => {
+    // 404 에러 처리 부분
+    res.status(404).send("일치하는 주소가 없습니다!");
+});
 
-            case '/':
-                // header 설정
-                response.writeHead(200, { 'Content-Type': 'text/html' })
-                    // 파일 읽는 메서드 
-                fs.readFile(__dirname + '/index.html', (err, data) => {
-                    if (err) {
-                        // 에러 발생시 에러 기록 후 종료 
-                        return console.error(err);
-                    }
-                    // 브라우저로 전송
-                    response.end(data, 'utf-8');
-                });
-                break;
-            default:
-                response.statusCode = 404;
-                response.end('주소가 없습니다');
-        }
-    }
-}).listen(8080);
+app.use((err, req, res, next) => {
+    // 서버 에러 처리 부분
+    console.error(err.stack);
+    // 500 상태 표시 후 에러메세지 전송
+    res.status(500).send("서버 에러!");
+});
+
+app.listen(8080, () => {
+    console.log("Express App on port 8080!");
+});
