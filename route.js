@@ -1,15 +1,21 @@
 const express = require("express");
-const path = require("path");
+const User = require("./user");
 
 // 라우터 분리
 const router = express.Router();
 
-router.get("/", (rep, res) => {
-    res.sendFile(path.join(__dirname, "html", "index.html"));
+router.get("/", (req, res) => {
+    res.render("index");
 });
 
-router.get("/about", (rep, res) => {
-    res.sendFile(path.join(__dirname, "html", "about.html"));
+router.get("/about", (req, res) => {
+    res.render("about");
+});
+
+router.get("/:name", (req, res) => {
+    User.find({ name: req.params.name }, (err, user) => {
+        res.render("index", { user });
+    });
 });
 
 // 모듈로 만들기

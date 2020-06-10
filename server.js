@@ -1,9 +1,12 @@
-const path = require("path");
-const route = require("./route");
 const express = require("express");
+const path = require("path");
 const app = express();
+const db = require("./db");
+const route = require("./route");
 
 app.use(express.static(path.join(__dirname, "html")));
+
+db();
 
 app.use("/", route);
 
